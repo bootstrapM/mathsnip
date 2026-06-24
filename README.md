@@ -108,6 +108,25 @@ mathsnip/
   cli.py            headless OCR for one image file
 ```
 
+## Uninstall
+
+Deleting the project folder removes the app and its `.venv` (the bulk of the
+disk use). A few things live in your home folder and should be cleaned up
+separately:
+
+```bash
+# your settings + snip history
+rm -rf ~/.mathsnip
+
+# cached model weights (a few hundred MB – ~1 GB)
+rm -rf ~/.pix2text ~/.cache/huggingface
+```
+
+If you installed with pipx, run `pipx uninstall mathsnip` instead of deleting a
+folder, then clean the home-folder paths above. You may also remove the terminal
+(or app) entry under System Settings → Privacy & Security → Screen Recording and
+Accessibility.
+
 ## Notes & limitations
 
 - macOS only (relies on `screencapture` and the status-bar). The OCR and
