@@ -43,6 +43,23 @@ python -m mathsnip
 The first capture downloads the Pix2Text model weights (~a few hundred MB) — give
 it a minute that one time.
 
+### A note on dependency pins
+
+The ML stack (PyTorch, transformers, optimum, OpenCV, NumPy…) doesn't pin its own
+sub-dependencies, so a plain "install the latest of everything" resolves
+differently on different machines and can land on an incompatible combo. The key
+constraint: on Intel Macs the available PyTorch wheels are built against NumPy
+1.x, but the newest OpenCV (4.12+) and NumPy (2.x) have moved on — and they're
+mutually exclusive. `requirements.txt` therefore carries bounded pins:
+
+- `numpy<2` — PyTorch wheels are built against NumPy 1.x.
+- `opencv-python<4.12` — 4.12+ requires NumPy ≥2.
+- `optimum<2` — optimum 2.0 relocated an import Pix2Text relies on.
+
+These resolve to a consistent, working set on both Intel and Apple Silicon. (A
+full `pip freeze` lockfile isn't used because it's architecture-specific — a
+lock from one Mac can pin a `torch` version with no wheel for the other.)
+
 ### macOS permissions
 
 Grant your terminal (or the packaged app) permission under

@@ -23,6 +23,8 @@ dependencies = [
     "PyQt6>=6.6",
     "PyQt6-WebEngine>=6.6",
     "numpy<2",            # PyTorch wheels are built against NumPy 1.x
+    "optimum<2",          # optimum 2.0 breaks Pix2Text's ORT import
+    "opencv-python<4.12", # 4.12+ requires numpy>=2, clashing with numpy<2
     "pix2text>=1.1.4",
     "Pillow>=10.0",
     "latex2mathml>=3.77",

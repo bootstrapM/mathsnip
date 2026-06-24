@@ -9,6 +9,15 @@ PyQt6-WebEngine>=6.6
 # not found" (especially on Intel Macs). Keep this above pix2text.
 numpy<2
 
+# Pin optimum < 2: optimum 2.0 moved `main_export` out of
+# `optimum.exporters.onnx`, which breaks Pix2Text's ORTModelForVision2Seq import
+# ("cannot import name 'main_export'"). 1.x keeps the old layout.
+optimum<2
+
+# Pin opencv-python < 4.12: 4.12+ requires numpy>=2 (Python 3.9+), which clashes
+# with the numpy<2 we need for torch. 4.11.x still works with numpy 1.x.
+opencv-python<4.12
+
 # Local OCR engine (image -> LaTeX). Downloads model weights on first run.
 # Pix2Text — the SOTA mfr-1.5 formula model (+ text+math in text_formula mode).
 pix2text>=1.1.4

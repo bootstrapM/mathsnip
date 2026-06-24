@@ -9,10 +9,10 @@ if [ ! -d ".venv" ]; then
   ./.venv/bin/pip install --upgrade pip
 fi
 
-# Always sync deps (fast once satisfied). Prevents a half-installed venv from
-# silently running without an OCR engine. Not quiet, so a big first-time
-# download (PyTorch, ONNX Runtime, etc.) shows progress instead of looking hung.
-echo "Checking dependencies (first run downloads ~1-2 GB of ML libraries)…"
+# Install dependencies (first run downloads ~1-2 GB of ML libraries).
+# requirements.txt uses bounded pins (numpy<2, optimum<2, opencv-python<4.12)
+# that resolve to a consistent set on both Intel and Apple Silicon.
+echo "Installing dependencies (first run downloads ~1-2 GB of ML libraries)…"
 ./.venv/bin/pip install -r requirements.txt
 
 exec ./.venv/bin/python -m mathsnip

@@ -63,12 +63,22 @@ class Pix2TextEngine:
         self.device = device
         self._formula = None   # LatexOCR (mfr)
         self._full = None      # Pix2Text pipeline
+        self.import_error = None   # set if pix2text exists but fails to import
 
     def available(self) -> bool:
         try:
             import pix2text  # noqa: F401
             return True
-        except Exception:
+        except ModuleNotFoundError as exc:
+            # pix2text itself missing -> genuinely not installed.
+            if (exc.name or "").split(".")[0] == "pix2text":
+                self.import_error = None
+            else:
+                self.import_error = exc   # a dependency is missing/broken
+            return False
+        except Exception as exc:  # noqa: BLE001
+            # Installed but failed to import (e.g. NumPy/torch ABI mismatch).
+            self.import_error = exc
             return False
 
     def _ensure(self) -> None:
@@ -201,6 +211,10 @@ class OcrEngine:
         return self._local_only(image_path)
 
     def _local_unavailable_msg(self) -> str:
+        err = getattr(self.local, "import_error", None)
+        if err is not None:
+            return (f"Pix2Text failed to load: {err}. "
+                    "Often a NumPy/torch mismatch — try: pip install 'numpy<2'")
         return "Pix2Text is not installed (pip install pix2text)."
 
     def _local_only(self, image_path: str) -> OcrResult:
