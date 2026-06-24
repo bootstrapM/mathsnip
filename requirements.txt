@@ -4,6 +4,11 @@ PyQt6>=6.6
 # If you skip this, the preview tab falls back to plain text.
 PyQt6-WebEngine>=6.6
 
+# Pin NumPy < 2: the PyTorch wheels pulled in by Pix2Text are built against
+# NumPy 1.x, and NumPy 2.x triggers "Failed to initialize NumPy: _ARRAY_API
+# not found" (especially on Intel Macs). Keep this above pix2text.
+numpy<2
+
 # Local OCR engine (image -> LaTeX). Downloads model weights on first run.
 # Pix2Text — the SOTA mfr-1.5 formula model (+ text+math in text_formula mode).
 pix2text>=1.1.4

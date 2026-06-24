@@ -22,6 +22,7 @@ classifiers = [
 dependencies = [
     "PyQt6>=6.6",
     "PyQt6-WebEngine>=6.6",
+    "numpy<2",            # PyTorch wheels are built against NumPy 1.x
     "pix2text>=1.1.4",
     "Pillow>=10.0",
     "latex2mathml>=3.77",
