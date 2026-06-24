@@ -22,9 +22,14 @@ classifiers = [
 dependencies = [
     "PyQt6>=6.6",
     "PyQt6-WebEngine>=6.6",
-    "numpy<2",            # PyTorch wheels are built against NumPy 1.x
-    "optimum<2",          # optimum 2.0 breaks Pix2Text's ORT import
-    "opencv-python<4.12", # 4.12+ requires numpy>=2, clashing with numpy<2
+    # Matched torch-2.4 era set (see requirements.txt for the full rationale).
+    # Apple Silicon only — torch 2.4 has no macOS Intel wheels.
+    "torch>=2.4,<2.5",
+    "torchvision>=0.19,<0.20",
+    "transformers>=4.44,<4.47",
+    "safetensors>=0.4.3,<0.5",
+    "optimum>=1.20,<2",
+    "onnxruntime<1.20",   # >=1.20 references torch.int4 (needs torch 2.6+)
     "pix2text>=1.1.4",
     "Pillow>=10.0",
     "latex2mathml>=3.77",

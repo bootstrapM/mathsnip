@@ -214,7 +214,8 @@ class OcrEngine:
         err = getattr(self.local, "import_error", None)
         if err is not None:
             return (f"Pix2Text failed to load: {err}. "
-                    "Often a NumPy/torch mismatch — try: pip install 'numpy<2'")
+                    "Usually a torch version mismatch — this stack needs "
+                    "torch 2.4.x (pip install 'torch>=2.4,<2.5').")
         return "Pix2Text is not installed (pip install pix2text)."
 
     def _local_only(self, image_path: str) -> OcrResult:

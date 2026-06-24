@@ -10,9 +10,15 @@ if [ ! -d ".venv" ]; then
 fi
 
 # Install dependencies (first run downloads ~1-2 GB of ML libraries).
-# requirements.txt uses bounded pins (numpy<2, optimum<2, opencv-python<4.12)
-# that resolve to a consistent set on both Intel and Apple Silicon.
+# Prefer requirements.lock (the exact, known-good versions captured from a
+# working machine). If it can't install here — e.g. a different architecture
+# where a pinned wheel doesn't exist — fall back to the bounded requirements.txt.
 echo "Installing dependencies (first run downloads ~1-2 GB of ML libraries)…"
-./.venv/bin/pip install -r requirements.txt
+if [ -f requirements.lock ] && ./.venv/bin/pip install -r requirements.lock; then
+  echo "Installed exact versions from requirements.lock."
+else
+  echo "Using requirements.txt (no usable lock for this machine)."
+  ./.venv/bin/pip install -r requirements.txt
+fi
 
 exec ./.venv/bin/python -m mathsnip

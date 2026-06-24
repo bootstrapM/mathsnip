@@ -4,22 +4,30 @@ PyQt6>=6.6
 # If you skip this, the preview tab falls back to plain text.
 PyQt6-WebEngine>=6.6
 
-# Pin NumPy < 2: the PyTorch wheels pulled in by Pix2Text are built against
-# NumPy 1.x, and NumPy 2.x triggers "Failed to initialize NumPy: _ARRAY_API
-# not found" (especially on Intel Macs). Keep this above pix2text.
-numpy<2
-
-# Pin optimum < 2: optimum 2.0 moved `main_export` out of
-# `optimum.exporters.onnx`, which breaks Pix2Text's ORTModelForVision2Seq import
-# ("cannot import name 'main_export'"). 1.x keeps the old layout.
-optimum<2
-
-# Pin opencv-python < 4.12: 4.12+ requires numpy>=2 (Python 3.9+), which clashes
-# with the numpy<2 we need for torch. 4.11.x still works with numpy 1.x.
-opencv-python<4.12
-
-# Local OCR engine (image -> LaTeX). Downloads model weights on first run.
-# Pix2Text — the SOTA mfr-1.5 formula model (+ text+math in text_formula mode).
+# Local OCR engine (Pix2Text). Its heavy ML dependencies (torch, transformers,
+# tokenizers, safetensors, numpy, opencv…) are intentionally left UNPINNED so
+# each machine installs the current, internally-consistent set — which is what
+# works. The Pix2Text model needs a *recent* transformers/torch, so do NOT pin
+# these down.
+#
+# The HF/torch stack must be pinned as ONE matched set from the torch 2.4 era
+# (~late 2024). Each constraint forces the next:
+#   * optimum<2          — 2.0 relocated `main_export` (breaks Pix2Text's import)
+#   * optimum 1.x        — imports `_attention_scale`, REMOVED in torch >=2.5  -> torch<2.5
+#   * model tokenizer    — needs recent tokenizers -> transformers>=4.44
+#   * transformers/safetensors after ~4.47 call `torch.uint16`/`torch.int4`
+#     (need torch>=2.6) -> cap transformers<4.47 and safetensors<0.5
+#   * torch>=2.4         — provides torch.uint16 that transformers 4.44-4.46 use
+# Net: torch 2.4.x + transformers 4.44-4.46 + safetensors 0.4.x + optimum 1.x.
+# (Apple Silicon only — torch 2.4 has no macOS Intel wheels; Intel = cloud engine.)
+torch>=2.4,<2.5
+torchvision>=0.19,<0.20
+transformers>=4.44,<4.47
+safetensors>=0.4.3,<0.5
+optimum>=1.20,<2
+# onnxruntime >=1.20 hard-references torch.int4 (only in torch 2.6+) in its
+# io_binding_helper, breaking model load on torch 2.4. 1.19.x predates it.
+onnxruntime<1.20
 pix2text>=1.1.4
 Pillow>=10.0
 
@@ -29,5 +37,9 @@ latex2mathml>=3.77
 # Global hotkey listener
 pynput>=1.7
 
-# Cloud fallback (OpenAI-compatible vision APIs). Only needed if you enable cloud.
+# Cloud engine (OpenAI-compatible vision APIs).
 requests>=2.31
+
+# NOTE: local OCR needs a recent PyTorch (>=2.4 via transformers), which has no
+# macOS *Intel* wheels — so on Intel Macs the local engine won't install/run;
+# use the cloud engine instead. Apple Silicon is fine.

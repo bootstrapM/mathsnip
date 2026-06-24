@@ -43,18 +43,33 @@ python -m mathsnip
 The first capture downloads the Pix2Text model weights (~a few hundred MB) — give
 it a minute that one time.
 
-### A note on dependency pins
+### A note on dependencies (and Intel Macs)
 
-The ML stack (PyTorch, transformers, optimum, OpenCV, NumPy…) doesn't pin its own
-sub-dependencies, so a plain "install the latest of everything" resolves
-differently on different machines and can land on an incompatible combo. The key
-constraint: on Intel Macs the available PyTorch wheels are built against NumPy
-1.x, but the newest OpenCV (4.12+) and NumPy (2.x) have moved on — and they're
-mutually exclusive. `requirements.txt` therefore carries bounded pins:
+Pix2Text pins none of its sub-dependencies, and over time the libraries it pulls
+(torch, transformers, safetensors, optimum, onnxruntime…) have evolved to need
+*mutually incompatible* torch versions. There's a narrow window where they line
+up, captured by the bounded pins in `requirements.txt`:
 
-- `numpy<2` — PyTorch wheels are built against NumPy 1.x.
-- `opencv-python<4.12` — 4.12+ requires NumPy ≥2.
+- `torch>=2.4,<2.5` — the only torch with both `torch.uint16` (needed by recent
+  transformers/safetensors) and `_attention_scale` (needed by optimum 1.x).
+- `transformers<4.47`, `safetensors<0.5`, `onnxruntime<1.20` — newer versions
+  reference `torch.int4`/`torch.uint16` symbols that only exist in torch ≥2.6.
 - `optimum<2` — optimum 2.0 relocated an import Pix2Text relies on.
+
+For exact reproducibility, **`requirements.lock`** records the full set of
+known-good versions (every transitive dependency, frozen from a working
+machine), and `run.sh` installs from it when present. To regenerate it after a
+deliberate upgrade:
+
+```bash
+./.venv/bin/pip freeze > requirements.lock
+```
+
+**Intel Macs:** local OCR effectively requires Apple Silicon. Recent
+`transformers` needs `torch ≥2.4`, and PyTorch stopped publishing macOS *Intel*
+wheels after 2.2 — so the local engine can't install a working combination on
+Intel. On an Intel Mac, use the **cloud** engine (Settings → Engine → cloud)
+instead.
 
 These resolve to a consistent, working set on both Intel and Apple Silicon. (A
 full `pip freeze` lockfile isn't used because it's architecture-specific — a
