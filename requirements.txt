@@ -1,0 +1,19 @@
+# Core UI
+PyQt6>=6.6
+# Optional but recommended: rendered equation preview (MathJax in a webview).
+# If you skip this, the preview tab falls back to plain text.
+PyQt6-WebEngine>=6.6
+
+# Local OCR engine (image -> LaTeX). Downloads model weights on first run.
+# Pix2Text — the SOTA mfr-1.5 formula model (+ text+math in text_formula mode).
+pix2text>=1.1.4
+Pillow>=10.0
+
+# LaTeX -> MathML (used for the MathML / Word tab)
+latex2mathml>=3.77
+
+# Global hotkey listener
+pynput>=1.7
+
+# Cloud fallback (OpenAI-compatible vision APIs). Only needed if you enable cloud.
+requests>=2.31

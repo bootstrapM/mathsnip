@@ -1,0 +1,32 @@
+# Virtual environment (huge: PyTorch, Qt, etc. — never commit)
+.venv/
+venv/
+env/
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Downloaded OCR model weights / caches (if any land locally)
+*.pth
+*.onnx
+.cache/
+
+# Local runtime state (do not ship a user's config/history)
+# Note: the app writes these to ~/.mathsnip, but ignore them if copied here.
+config.json
+config.json.bak
+history.json
+
+# Generated test artifacts
+mathml_test.html
+
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+*.swp
